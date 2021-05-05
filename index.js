@@ -44,8 +44,7 @@ app.get('/users/:userId', function (req, res) {
         if (error) {
             res.send(error, 500)
         }else{
-            console.log(result)
-            if (result.length == 0) {
+            if (result.length != 0) {
                 res.send('No user found with ID ' + userId, 404)
             }else{
                 res.send(result)[0]
@@ -59,7 +58,6 @@ app.get('/users', function (req, res) {
         if (error) {
             res.send(error, 500)
         }else{
-            console.log(fields)
             res.send(result)
         }
     })
@@ -154,6 +152,17 @@ app.delete('/users/:userId', function (req, res) {
     })
 })
 
+app.get('/users/members/:roomId', function (req, res) {
+    let roomId = req.params.roomId
+    con.query('SELECT * FROM users WHERE roomId = ?', [roomId], (error, result, fields) => {
+        if (error) {
+            res.send(error, 500)
+        }else{
+            res.send(result)
+        }
+    })
+})
+
 app.get('/users/:userId/nearby/:threshold', function (req, res) {
     let userId = req.params.userId;
     let threshold = req.params.threshold
@@ -164,9 +173,10 @@ app.get('/users/:userId/nearby/:threshold', function (req, res) {
             if (result.length == 1) {
             
                 const user = result[0]
+                const roomId = user.roomId
                 const nearby = []
     
-                con.query('SELECT * FROM users WHERE NOT id = ?', [userId], (error, result, fields) => {
+                con.query('SELECT * FROM users WHERE roomId = ? AND NOT id = ?', [roomId, userId], (error, result, fields) => {
                     if (error) {
                         res.send(error, 500)
                     }else{
