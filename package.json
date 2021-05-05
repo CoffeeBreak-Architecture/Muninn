@@ -19,6 +19,6 @@
   "dependencies": {
     "express": "^4.17.1",
     "mysql2": "^2.2.5",
-    "uuidv4": "^6.2.7"
+    "uuid": "^8.3.2"
   }
 }

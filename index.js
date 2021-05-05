@@ -2,7 +2,7 @@ const express = require('express')
 const app = express()
 const mysql = require('mysql2')
 const port = 3010
-const { uuid } = require('uuidv4');
+const {v4:uuid} = require('uuid');
 
 app.use(express.json());
 
@@ -150,6 +150,37 @@ app.delete('/users/:userId', function (req, res) {
             res.send(error, 500)
         }else{
             res.sendStatus(200)
+        }
+    })
+})
+
+app.get('/users/:userId/nearby/:threshold', function (req, res) {
+    let userId = req.params.userId;
+    let threshold = req.params.threshold
+    con.query('SELECT * FROM users WHERE id = ?', [userId], (error, result, fields) => {
+        if (error) {
+            res.send(error, 500)
+        }else {
+            if (result.length == 1) {
+            
+                const user = result[0]
+                const nearby = []
+    
+                con.query('SELECT * FROM users WHERE NOT id = ?', [userId], (error, result, fields) => {
+                    result.forEach(x => {
+
+                        let ox = x.x
+                        let oy = x.y
+
+                        let sqrDist = Math.pow(ox - user.x, 2) + Math.pow(oy - user.y, 2)
+                        if (sqrDist < threshold * threshold) {
+                            nearby.push({id: x.id, x: ox, y: oy, sqrDist: sqrDist})
+                        }
+                    })
+
+                    res.send(nearby, 200)
+                })
+            }
         }
     })
 })
