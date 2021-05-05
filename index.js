@@ -32,9 +32,9 @@ function initalizeDatabase () {
     console.log(createTableQuery)
     con.query(createTableQuery, function(error, result, fields) {
         if (error) {
-            console.error('Failed to fetch users.', error)
+            console.error('Failed to initialize database.', error)
         }
-        console.log('Succesfully initialized new user database table.')
+        console.log('Succesfully initialized database!')
     })
 }
 
@@ -167,18 +167,22 @@ app.get('/users/:userId/nearby/:threshold', function (req, res) {
                 const nearby = []
     
                 con.query('SELECT * FROM users WHERE NOT id = ?', [userId], (error, result, fields) => {
-                    result.forEach(x => {
+                    if (error) {
+                        res.send(error, 500)
+                    }else{
+                        result.forEach(x => {
 
-                        let ox = x.x
-                        let oy = x.y
+                            let ox = x.x
+                            let oy = x.y
 
-                        let sqrDist = Math.pow(ox - user.x, 2) + Math.pow(oy - user.y, 2)
-                        if (sqrDist < threshold * threshold) {
-                            nearby.push({id: x.id, x: ox, y: oy, sqrDist: sqrDist})
-                        }
-                    })
+                            let sqrDist = Math.pow(ox - user.x, 2) + Math.pow(oy - user.y, 2)
+                            if (sqrDist < threshold * threshold) {
+                                nearby.push({id: x.id, x: ox, y: oy, sqrDist: sqrDist})
+                            }
+                        })
 
-                    res.send(nearby, 200)
+                        res.send(nearby, 200)
+                    }
                 })
             }
         }
