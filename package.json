@@ -1,0 +1,24 @@
+{
+  "name": "userrepository",
+  "version": "1.0.0",
+  "description": "UserRepository",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CoffeeBreak-Architecture/UserRepository.git"
+  },
+  "author": "Lomzieboi",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/CoffeeBreak-Architecture/UserRepository/issues"
+  },
+  "homepage": "https://github.com/CoffeeBreak-Architecture/UserRepository#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "mysql2": "^2.2.5",
+    "uuidv4": "^6.2.7"
+  }
+}
