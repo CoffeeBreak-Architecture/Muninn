@@ -44,10 +44,10 @@ app.get('/users/:userId', function (req, res) {
         if (error) {
             res.send(error, 500)
         }else{
-            if (result.length != 0) {
+            if (result.length != 1) {
                 res.send('No user found with ID ' + userId, 404)
             }else{
-                res.send(result)[0]
+                res.send(result[0])
             }
         }
     })
@@ -86,7 +86,7 @@ app.post('/users', function (req, res) {
 app.patch('/users/:userId/room', function (req, res) {
 
     let userId = req.params.userId;
-    let roomId = req.body.room;
+    let roomId = req.body.roomId;
 
     con.query('UPDATE users SET roomId = ? WHERE id = ?', [roomId, userId], (error, result, fields) => {
         if (error) {
