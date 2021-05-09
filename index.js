@@ -66,7 +66,7 @@ app.get('/users', function (req, res) {
 app.post('/users', function (req, res) {
 
     let id = uuid()
-    let room = null
+    let room = req.body.roomId
     let nickname = req.body.nickname
     let x = 100
     let y = 100
