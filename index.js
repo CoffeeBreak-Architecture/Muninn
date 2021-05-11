@@ -16,16 +16,14 @@ const createTableQuery = 'CREATE TABLE IF NOT EXISTS users ('
  + 'hasVideo BOOLEAN'
  + ')'
 
-const con = mysql.createConnection({
+const con = mysql.createPool({
     host: process.env.MYSQL_HOST,
     user: process.env.MYSQL_USER,
     password: process.env.MYSQL_PASSWORD,
-    database: process.env.MYSQL_DATABASE
-})
-con.connect(function(error) {
-    if (error) {
-       throw error
-    } else initalizeDatabase()
+    database: process.env.MYSQL_DATABASE,
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
 })
 
 function initalizeDatabase () {
@@ -205,4 +203,5 @@ app.post('/users/nearby', function (req, res) {
 
 app.listen(port, () => {
     console.log('User repository is listening at port: ' + port)
+    initalizeDatabase()
 })
