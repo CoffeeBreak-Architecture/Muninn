@@ -38,7 +38,11 @@ function initalizeDatabase () {
     })
 }
 
-app.get('/users/:userId', function (req, res) {
+app.get("/", (req, res) => {
+    res.send("");
+})
+
+app.get('/users/user/:userId', function (req, res) {
     let userId = req.params.userId;
     con.query('SELECT * FROM users WHERE id = ?', [userId], (error, result, fields) => {
         if (error) {
@@ -97,9 +101,9 @@ app.patch('/users/:userId/room', function (req, res) {
     })
 })
 
-app.patch('/users/:userId/nickname', function (req, res) {
+app.patch('/users/nickname', function (req, res) {
 
-    let userId = req.params.userId;
+    let userId = req.body.clientId;
     let nickname = req.body.nickname
 
     con.query('UPDATE users SET nickname = ? WHERE id = ?', [nickname, userId], (error, result, fields) => {
@@ -111,9 +115,9 @@ app.patch('/users/:userId/nickname', function (req, res) {
     })
 })
 
-app.patch('/users/:userId/position', function (req, res) {
+app.patch('/users/position', function (req, res) {
 
-    let userId = req.params.userId;
+    let userId = req.body.clientId;
     let x = req.body.x
     let y = req.body.y
 
@@ -141,7 +145,7 @@ app.patch('/users/:userId/state', function (req, res) {
     })
 })
 
-app.delete('/users/:userId', function (req, res) {
+app.delete('/users/user/:userId', function (req, res) {
     let userId = req.params.userId;
     con.query('DELETE FROM users WHERE id = ?', [userId], (error, result, fields) => {
         if (error) {
@@ -163,9 +167,9 @@ app.get('/users/members/:roomId', function (req, res) {
     })
 })
 
-app.get('/users/:userId/nearby/:threshold', function (req, res) {
-    let userId = req.params.userId;
-    let threshold = req.params.threshold
+app.post('/users/nearby', function (req, res) {
+    let userId = req.body.userId;
+    let threshold = req.body.threshold
     con.query('SELECT * FROM users WHERE id = ?', [userId], (error, result, fields) => {
         if (error) {
             res.send(error, 500)
