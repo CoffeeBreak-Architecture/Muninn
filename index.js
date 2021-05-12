@@ -44,10 +44,10 @@ app.get('/users/user/:userId', function (req, res) {
     let userId = req.params.userId;
     con.query('SELECT * FROM users WHERE id = ?', [userId], (error, result, fields) => {
         if (error) {
-            res.send(error, 500)
+            res.status(500).send(error)
         }else{
             if (result.length != 1) {
-                res.send('No user found with ID ' + userId, 404)
+                res.status(404).send('No user found with ID ' + userId)
             }else{
                 res.send(result[0])
             }
@@ -75,12 +75,16 @@ app.post('/users', function (req, res) {
     let hasAudio = false
     let hasVideo = false
 
+    if (room == undefined || nickname == undefined) {
+        throw 'Body must contain both a roomId and nickname value.'
+    }
+
     con.query("INSERT INTO users VALUES (?, ?, ?, ?, ?, ?, ?)", [id, room, nickname, x, y, hasAudio, hasVideo], (error, result, fields) => {
         if (error) {
-            res.send(error, 500)
+            res.status(500).send(error)
         }else{
             user = {id: id, roomId: room, nickname: nickname, x: x, y: x, hasAudio: hasAudio, hasVideo: hasVideo}
-            res.send(user, 201)
+            res.status(201).send(user)
         }
     })
 })
@@ -92,7 +96,7 @@ app.patch('/users/:userId/room', function (req, res) {
 
     con.query('UPDATE users SET roomId = ? WHERE id = ?', [roomId, userId], (error, result, fields) => {
         if (error) {
-            res.send(error, 500)
+            res.status(500).send(error)
         }else{
             res.sendStatus(200)
         }
@@ -106,7 +110,7 @@ app.patch('/users/nickname', function (req, res) {
 
     con.query('UPDATE users SET nickname = ? WHERE id = ?', [nickname, userId], (error, result, fields) => {
         if (error) {
-            res.send(error, 500)
+            res.status(500).send(error)
         }else{
             res.sendStatus(200)
         }
@@ -121,7 +125,7 @@ app.patch('/users/position', function (req, res) {
 
     con.query('UPDATE users SET x = ?, y = ? WHERE id = ?', [x, y, userId], (error, result, fields) => {
         if (error) {
-            res.send(error, 500)
+            res.status(500).send(error)
         }else{
             res.sendStatus(200)
         }
@@ -131,6 +135,7 @@ app.patch('/users/position', function (req, res) {
 app.patch('/users/:userId/state', function (req, res) {
 
     let userId = req.params.userId;
+    
     let hasAudio = req.body.hasAudio
     let hasVideo = req.body.hasVideo
 
@@ -177,6 +182,7 @@ app.post('/users/nearby', function (req, res) {
                 const user = result[0]
                 const roomId = user.roomId
                 const nearby = []
+                console.log('what')
     
                 con.query('SELECT * FROM users WHERE roomId = ? AND NOT id = ?', [roomId, userId], (error, result, fields) => {
                     if (error) {
