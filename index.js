@@ -28,12 +28,14 @@ const con = mysql.createPool({
 
 function initalizeDatabase () {
     console.log(createTableQuery)
-    con.query(createTableQuery, function(error, result, fields) {
-        if (error) {
-            console.error('Failed to initialize database.', error)
-        }
-        console.log('Succesfully initialized database!')
-    })
+    try{
+        con.query(createTableQuery)
+        console.log("Table created")
+    }
+    catch(err){
+        console.log(err)
+    }
+    
 }
 
 app.get("/", (req, res) => {
