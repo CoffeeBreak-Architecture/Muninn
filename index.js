@@ -26,6 +26,7 @@ const con = mysql.createPool({
     queueLimit: 0
 })
 
+// Initialize the database table with the query defined above.
 function initalizeDatabase () {
     console.log(createTableQuery)
     con.query(createTableQuery, function(error, result, fields) {
@@ -40,6 +41,7 @@ app.get("/", (req, res) => {
     res.send("");
 })
 
+// Get a particular user through the ID
 app.get('/users/user/:userId', function (req, res) {
     let userId = req.params.userId;
     con.query('SELECT * FROM users WHERE id = ?', [userId], (error, result, fields) => {
@@ -55,6 +57,7 @@ app.get('/users/user/:userId', function (req, res) {
     })
 })
 
+// Get ALL THE USERS
 app.get('/users', function (req, res) {
     con.query('SELECT * FROM users', (error, result, fields) => {
         if (error) {
@@ -65,6 +68,7 @@ app.get('/users', function (req, res) {
     })
 })
 
+// Post a new user
 app.post('/users', function (req, res) {
 
     let id = uuid()
@@ -89,6 +93,7 @@ app.post('/users', function (req, res) {
     })
 })
 
+// Patch the users room.
 app.patch('/users/:userId/room', function (req, res) {
 
     let userId = req.params.userId;
@@ -103,6 +108,7 @@ app.patch('/users/:userId/room', function (req, res) {
     })
 })
 
+// Patch the users nickname
 app.patch('/users/nickname', function (req, res) {
 
     let userId = req.body.clientId;
@@ -117,6 +123,7 @@ app.patch('/users/nickname', function (req, res) {
     })
 })
 
+// Patch the users position
 app.patch('/users/position', function (req, res) {
 
     let userId = req.body.clientId;
@@ -132,6 +139,7 @@ app.patch('/users/position', function (req, res) {
     })
 })
 
+// Patch the users state
 app.patch('/users/:userId/state', function (req, res) {
 
     let userId = req.params.userId;
@@ -148,6 +156,7 @@ app.patch('/users/:userId/state', function (req, res) {
     })
 })
 
+// Delete a particular user by ID
 app.delete('/users/user/:userId', function (req, res) {
     let userId = req.params.userId;
     con.query('DELETE FROM users WHERE id = ?', [userId], (error, result, fields) => {
@@ -159,6 +168,8 @@ app.delete('/users/user/:userId', function (req, res) {
     })
 })
 
+// Get the members of a particular room.
+// This would, in a domain context, make more sense in the room repository, however as users are the ones who contain the room ID, it needs to be here.
 app.get('/users/members/:roomId', function (req, res) {
     let roomId = req.params.roomId
     con.query('SELECT * FROM users WHERE roomId = ?', [roomId], (error, result, fields) => {
@@ -170,9 +181,13 @@ app.get('/users/members/:roomId', function (req, res) {
     })
 })
 
+// Fetch all users nearby to a user and within a threshold defined in the http body.
+// This is only a POST due to issues with the deployment. Should be a GET.
 app.post('/users/nearby', function (req, res) {
     let userId = req.body.userId;
     let threshold = req.body.threshold
+
+    // Select the user requested to find nearby from.
     con.query('SELECT * FROM users WHERE id = ?', [userId], (error, result, fields) => {
         if (error) {
             res.send(error, 500)
@@ -182,8 +197,8 @@ app.post('/users/nearby', function (req, res) {
                 const user = result[0]
                 const roomId = user.roomId
                 const nearby = []
-                console.log('what')
     
+                // Select all OTHER users from the same room as the first selected user.
                 con.query('SELECT * FROM users WHERE roomId = ? AND NOT id = ?', [roomId, userId], (error, result, fields) => {
                     if (error) {
                         res.send(error, 500)
@@ -193,6 +208,7 @@ app.post('/users/nearby', function (req, res) {
                             let ox = x.x
                             let oy = x.y
 
+                            // Calculate square distance and insure that it is within the square of the threshold.
                             let sqrDist = Math.pow(ox - user.x, 2) + Math.pow(oy - user.y, 2)
                             if (sqrDist < threshold * threshold) {
                                 nearby.push({id: x.id, x: ox, y: oy, sqrDist: sqrDist})
